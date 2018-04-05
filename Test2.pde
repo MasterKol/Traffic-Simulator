@@ -450,7 +450,7 @@ function FindCIF(that) { // CIF = Car in front
 		for(var i = 0; i < valid.length; i++){
 			var a = cars[valid[i]];
 			var dist = (a.pos.x - that.pos.x)*temp;
-			if(dist < CIF[1]){
+			if(dist > 0 && dist < CIF[1]){
 				CIF[0] = a.num;
 				CIF[1] = dist;
 			}
