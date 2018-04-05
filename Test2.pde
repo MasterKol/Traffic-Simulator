@@ -7,7 +7,7 @@ rectMode(CENTER);
 
 randomSeed(1);
 
-var useImages = true;
+var useImages = false;
 var averageSpeed = 0;
 
 var carImages = [loadImage("/Images/Car1.jpg"),loadImage("/Images/Car2.jpg"),loadImage("/Images/Car3.jpg"),loadImage("/Images/Car4.jpg")];
