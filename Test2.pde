@@ -438,7 +438,7 @@ function FindCIF(that) { // CIF = Car in front
 	var nvalid = [];
 	
 	for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-		if(that.rotation === cars[valid[i]].rotation){
+		if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
 			nvalid.push(valid[i]);
 		}
 	}
@@ -450,7 +450,7 @@ function FindCIF(that) { // CIF = Car in front
 		for(var i = 0; i < valid.length; i++){
 			var a = cars[valid[i]];
 			var dist = (a.pos.x - that.pos.x)*temp;
-			if(dist > 0 && dist < CIF[1]){
+			if(dist < CIF[1]){
 				CIF[0] = a.num;
 				CIF[1] = dist;
 			}
@@ -460,7 +460,7 @@ function FindCIF(that) { // CIF = Car in front
 			var valid = board[that.tile.x+temp][that.tile.y].cars;
 			var nvalid = [];
 			for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-				if(that.rotation === cars[valid[i]].rotation){
+				if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
 					nvalid.push(valid[i]);
 				}
 			}
@@ -490,7 +490,7 @@ function FindCIF(that) { // CIF = Car in front
 			var valid = board[that.tile.x][that.tile.y+temp].cars;
 			var nvalid = [];
 			for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-				if(that.rotation === cars[valid[i]].rotation){
+				if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
 					nvalid.push(valid[i]);
 				}
 			}
