@@ -5,7 +5,7 @@ void setup() {
 
 rectMode(CENTER);
 
-randomSeed(1);
+//randomSeed(1);
 
 var useImages = false;
 var averageSpeed = 0;
