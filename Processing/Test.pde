@@ -7,13 +7,13 @@ rectMode(CENTER);
 
 randomSeed(1);
 
-var useImages = false;
-var averageSpeed = 0;
+var useImages = true;
 
 var carImages = [loadImage("/Images/Car1.jpg"),loadImage("/Images/Car2.jpg"),loadImage("/Images/Car3.jpg"),loadImage("/Images/Car4.jpg")];
 
 var time = 12;
-var FR = 60;
+
+frameRate(60);
 
 var Size = [41,23];
 var board_Scale = 4;
@@ -152,10 +152,6 @@ function piece(x,y,connections){
 	this.place = new PVector(x,y);
 	this.pos = new PVector(x*10*board_Scale+(100/board_Scale), y*10*board_Scale+(100/board_Scale));
 	this.cars = [];
-	this.intersection = "STOP"; // Can be "STOP" for a 4 way stop or "LIGHT" for a stop light
-	if(this.intersection === "LIGHT"){
-		this.intTimer = round(random(5,10)); // time(in seconds) between the changing of the stop light
-	}
 }
 
 function AdjCon(x,y){
@@ -370,7 +366,7 @@ function PickDir(x,y,road){
 		posibilies = [(road+2)%4];
 	}
 
-	out = posibilies[round(random(-0.5,posibilies.length-0.50001))];
+	out = posibilies[round(random(0,posibilies.length-1))];
 	return out;
 }
 
@@ -438,7 +434,7 @@ function FindCIF(that) { // CIF = Car in front
 	var nvalid = [];
 	
 	for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-		if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
+		if(that.rotation === cars[valid[i]].rotation){
 			nvalid.push(valid[i]);
 		}
 	}
@@ -460,7 +456,7 @@ function FindCIF(that) { // CIF = Car in front
 			var valid = board[that.tile.x+temp][that.tile.y].cars;
 			var nvalid = [];
 			for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-				if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
+				if(that.rotation === cars[valid[i]].rotation){
 					nvalid.push(valid[i]);
 				}
 			}
@@ -490,7 +486,7 @@ function FindCIF(that) { // CIF = Car in front
 			var valid = board[that.tile.x][that.tile.y+temp].cars;
 			var nvalid = [];
 			for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-				if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
+				if(that.rotation === cars[valid[i]].rotation){
 					nvalid.push(valid[i]);
 				}
 			}
@@ -512,9 +508,9 @@ function FindCIF(that) { // CIF = Car in front
 
 function FindInt(that) {
 	if(round(that.pos.x) === 0){
-
+		
 	}else{
-
+		
 	}
 }
 
@@ -531,16 +527,12 @@ Car.prototype.FindSpeed = function() {
 			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)-1,0,10);
 		}else if(this.CIFdist < 15){
 			this.speed = constrain(this.CIF.speed,0,this.CIF.maxSpeed);
-		}else if(this.CIFdist < 30){
-			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)+ceil(this.CIFdist/5*2)/2,0,10);
-		}else if(this.CIFdist < 50){
-			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)+ceil(this.CIFdist/5),0,10);
+		}else if(this.CIFdist < 20){
+			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)+1,0,10);
 		}else{
-			this.speed = constrain(this.speed+0.5,0,10);
+			this.speed = 10;
 		}
 	}
-
-	averageSpeed += constrain(this.speed,0,this.maxSpeed);
 };
 
 var cars = [];
@@ -570,7 +562,7 @@ function CreateCar(){
 	//println(selection);
 }
 
-for(var i = 0; i < 1000; i++){
+for(var i = 0; i < 800; i++){
 	CreateCar();
 }
 
@@ -585,8 +577,6 @@ for(var x = 0; x < Size[0]; x++){
 		board[x][y].Connect();
 	}
 }
-
-frameRate(FR);
 
 void draw(){
 	background(50,255,50);
@@ -611,12 +601,10 @@ void draw(){
 
 	//(x-(100/board_Scale))/board_Scale/10 = tx, (y-(100/board_Scale))/board_Scale/10 = ty
 	var mouseTile = [constrain(round(((mouseX-offset[0])-(100/board_Scale))/board_Scale/10),0,Size[0]), constrain(round(((mouseY-offset[1])-(100/board_Scale))/board_Scale/10),0,Size[1])];
-
 	if(mousePressed){
 		//frameRate(5);
 		//println(mouseTile[0]+", "+mouseTile[1]);
 		//board[mouseTile[0]][mouseTile[1]].Connect();
-
 	}else{
 		//frameRate(60);
 	}
@@ -644,7 +632,7 @@ void draw(){
 	//}
 
 	if(timer%20 === 0 && round(random(0,1)) === 1 && cars.length < 300){
-		//CreateCar();
+		CreateCar();
 	}
 	
 	if(timer%1000 === 0){
@@ -664,13 +652,10 @@ void draw(){
 		}
 	}
 
-	averageSpeed = 0;
 	for(var i = 0; i < cars.length; i++){
 		cars[i].FindSpeed();
 	}
-	println(averageSpeed/cars.length);
 
-	noStroke();
 	for(var i = 0; i < cars.length; i++){
 		cars[i].Draw();
 		cars[i].Drive();
