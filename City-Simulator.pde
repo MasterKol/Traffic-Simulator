@@ -7,7 +7,7 @@ rectMode(CENTER);
 
 randomSeed(1);
 
-var useImages = true;
+var useImages = false;
 var averageSpeed = 0;
 
 var carImages = [loadImage("/Car1.jpg"),loadImage("/Car2.jpg"),loadImage("/Car3.jpg"),loadImage("/Car4.jpg")];
@@ -490,8 +490,17 @@ function FindCIF(that) { // CIF = Car in front
 	var nvalid = [];
 	
 	for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
+<<<<<<< HEAD:City-Simulator.pde
 		var a = cars[valid[i]];
 		if(that.rotation === a.rotation && that.num !== cars[valid[i]].num){//(that.pos.x*cos(that.rotation) >= a.pos.x+abs(cos(a.rotation)+1)*4 && that.pos.x*cos(that.rotation) <= a.pos.x-abs(cos(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || (that.pos.y*sin(that.rotation) <= a.pos.y+abs(sin(a.rotation)+1)*4 && that.pos.y*sin(that.rotation) >= a.pos.y-abs(sin(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || 
+=======
+<<<<<<< HEAD:Processing/Test2.pde
+		var a = cars[valid[i]];
+		if(that.rotation === a.rotation && that.num !== cars[valid[i]].num){//(that.pos.x*cos(that.rotation) >= a.pos.x+abs(cos(a.rotation)+1)*4 && that.pos.x*cos(that.rotation) <= a.pos.x-abs(cos(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || (that.pos.y*sin(that.rotation) <= a.pos.y+abs(sin(a.rotation)+1)*4 && that.pos.y*sin(that.rotation) >= a.pos.y-abs(sin(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || 
+=======
+		if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
+>>>>>>> 0cd440d25c556fa0e3c51e9b0aee15ae9222903d:Test2.pde
+>>>>>>> 42106ad3502199ca593f9c00ac0aec8b4f8a23c8:Test2.pde
 			nvalid.push(valid[i]);
 		}
 	}
@@ -571,10 +580,17 @@ function FindInt(that) {
 		output[1] = tile.intersection;
 	}else{
 		output[1] = null;
+<<<<<<< HEAD:City-Simulator.pde
 	}
 	if(tile.intersection === "LIGHT"){
 		output[2] = tile.Dir;
 	}
+=======
+	}
+	if(tile.intersection === "LIGHT"){
+		output[2] = tile.Dir;
+	}
+>>>>>>> 42106ad3502199ca593f9c00ac0aec8b4f8a23c8:Test2.pde
 	return output;
 }
 
