@@ -8,12 +8,12 @@ rectMode(CENTER);
 randomSeed(1);
 
 var useImages = true;
-var averageSpeed = 0;
 
-var carImages = [loadImage("/Car1.jpg"),loadImage("/Car2.jpg"),loadImage("/Car3.jpg"),loadImage("/Car4.jpg")];
+var carImages = [loadImage("/Images/Car1.jpg"),loadImage("/Images/Car2.jpg"),loadImage("/Images/Car3.jpg"),loadImage("/Images/Car4.jpg")];
 
-var time = 2;
-var FR = 60;
+var time = 12;
+
+frameRate(60);
 
 var Size = [41,23];
 var board_Scale = 4;
@@ -152,19 +152,6 @@ function piece(x,y,connections){
 	this.place = new PVector(x,y);
 	this.pos = new PVector(x*10*board_Scale+(100/board_Scale), y*10*board_Scale+(100/board_Scale));
 	this.cars = [];
-	this.intersection = round(random(0,1)); // Can be "STOP" for a 4 way stop or "LIGHT" for a stop light. If there are only two roads there will be no intersection and the cars will just drive normally
-	if(this.intersection===0){this.intersection="STOP";}else{this.intersection="LIGHT";}
-	if(this.intersection === "LIGHT"){
-		this.intTime = round(random(5,10)); // time(in seconds) between the changing of the stop light
-		this.Dir = 0; // 0 is horizontal, 1 is vertical for lights to be on
-	}
-	this.timer = 0;
-	this.roadnum = 0;
-	for(var i = 0; i < this.connections.length; i++){
-		if(this.connections[i] === 1){
-			this.roadnum++;
-		}
-	}
 }
 
 function AdjCon(x,y){
@@ -173,11 +160,11 @@ function AdjCon(x,y){
 	if(x+1 < Size[0]){
 		output[0] = board[x+1][y].connections[2];
 	}
-	if(y+1 < Size[1]){
-		output[1] = board[x][y+1].connections[3];
-	}
 	if(x-1 > 0){
 		output[2] = board[x-1][y].connections[0];
+	}
+	if(y+1 < Size[1]){
+		output[1] = board[x][y+1].connections[3];
 	}
 	if(y-1 > 0){
 		output[3] = board[x][y-1].connections[1];
@@ -188,20 +175,9 @@ function AdjCon(x,y){
 
 piece.prototype.Connect = function(){
 	var adj = AdjCon(this.place.x,this.place.y);
-	for(var i = 0; i < adj.length; i++){;
-		if(adj[i] === 1 && this.connections[i] !== 1){
-			this.connections[i] = 1;
-			this.roadnum++;
-		}
-	}
-};
-
-piece.prototype.IntTick = function(){
-	if(this.intersection === "LIGHT"){
-		this.timer++;
-		if(this.timer >= round(this.intTime*FR)){
-			if(this.Dir===0){this.Dir=1;}else{this.Dir=0;}
-			this.timer=0;
+	for(var i = 0; i < adj.length; i++){
+		if(adj[i] === 1){
+			board[this.place.x][this.place.y].connections[i] = 1;
 		}
 	}
 };
@@ -261,19 +237,6 @@ piece.prototype.Spread = function(){
 	}
 };
 
-function octagon(x,y,Scale) {
-	pushMatrix();
-	translate(x,y);
-	scale(Scale);
-	rectMode(CENTER);
-	rect(0,0,4.14,10);
-	rect(0,0,10,4.14);
-	rotate(HALF_PI/2);
-	rect(0,0,4.14,10);
-	rect(0,0,10,4.14);
-	popMatrix();
-}
-
 piece.prototype.Draw = function() {
 	//reset position
 	this.pos = new PVector(this.place.x*10*board_Scale+(100/board_Scale), this.place.y*10*board_Scale+(100/board_Scale));
@@ -299,23 +262,7 @@ piece.prototype.Draw = function() {
 
 				if(this.buildings[i][0] === 1){
 					fill(this.buildings[i][1]);
-					rect(32,-32,30,30);
-				}
-				
-				if(this.roadnum > 2){
-					if(this.intersection === "STOP"){
-						fill(255,0,0);
-						octagon(14, -10, 0.5);
-					}
-
-					if(this.intersection === "LIGHT"){
-						if(this.Dir === i%2){
-							fill(0, 128, 0);
-						}else{
-							fill(255, 0, 0);
-						}
-						rect(14,-10,4,4);
-					}
+					rect(30,-30,36,36);
 				}
 			}
 			rotate(HALF_PI);
@@ -359,8 +306,6 @@ function Car(x, y, road){
 	this.maxSpeed = round(random(5,10)); // the maximum speed of the car
 	this.timer = 0;
 	this.turned = false;
-	this.stopTime = round(random(0.1,1)*10)/10;
-	this.stopTimer = 0;
 }
 
 Car.prototype.Draw = function(){
@@ -368,27 +313,27 @@ Car.prototype.Draw = function(){
 	this.timer--;
 
 	if(this.absPos.x > -(8*(board_Scale/10)) && this.absPos.x < width+(8*(board_Scale/10)) && this.absPos.y > -(8*(board_Scale/10)) && this.absPos.y < height+(8*(board_Scale/10))){
-		//var box = [new PVector(this.absPos.x-abs(constrain(cos(this.rotation/90*HALF_PI)*2,1,2)*2), this.absPos.y-abs(constrain(sin(this.rotation/90*HALF_PI)*2,1,2)*2)), new PVector(this.absPos.x+abs(constrain(cos(this.rotation/90*HALF_PI)*2,1,2)*2), this.absPos.y+abs(constrain(sin(this.rotation/90*HALF_PI)*2,1,2)*2))]; // top left cord then top right cord
-		//if(this.num === 157){
+		var box = [new PVector(this.absPos.x-abs(constrain(cos(this.rotation/90*HALF_PI)*2,1,2)*2), this.absPos.y-abs(constrain(sin(this.rotation/90*HALF_PI)*2,1,2)*2)), new PVector(this.absPos.x+abs(constrain(cos(this.rotation/90*HALF_PI)*2,1,2)*2), this.absPos.y+abs(constrain(sin(this.rotation/90*HALF_PI)*2,1,2)*2))]; // top left cord then top right cord
+		if(this.num === 157){
 			//fill(255,0,0);
 			//textSize(12);
 			//text("-------------\nInformation for car #" + this.num + "\npos: " + this.pos + "\nroad: " + this.road + ", " + this.newRoad + "\nspeed: " + this.speed + "\ntile: " + this.tile + "\nrotation: " + this.rotation, 0, 0);
-		//}
+		}
 
 		//fill(255,0,0);
 		//rect(box[0].x, box[0].y, box[1].x, box[1].y);
 
-		//if(this.num === 1){
+		if(this.num === 1){
 			//println(abs(constrain(cos(this.rotation/90*HALF_PI)*2,1,2)*2));
-		//}
+		}
 
 		pushMatrix();
 		translate(this.absPos.x-offset[0], this.absPos.y-offset[1]);
-		//if(this.num === 157){
-		//	fill(255,0,0);
-		//	textSize(12);
+		if(this.num === 157){
+			fill(255,0,0);
+			textSize(12);
 			//text("Information for car #" + this.num + "\npos: " + this.pos + "\nroad: " + this.road + ", " + this.newRoad + "\nspeed: " + this.speed + "\ntile: " + this.tile + "\nrotation: " + this.rotation + "\nnew Y: " + round((this.pos.y+sin(this.rotation/180*PI)*constrain(this.speed,0,this.maxSpeed)/10)*10)/10, 0, 0);
-		//}
+		}
 		rotate(this.rotation/180*PI);
 		scale(board_Scale/10);
 		//stroke(0,0,0);
@@ -399,7 +344,7 @@ Car.prototype.Draw = function(){
 			fill(this.Color[0], this.Color[1], this.Color[2]);
 			rect(0,3.5,8,4);
 		}else{
-			image(this.Image, -4, 1.5, 8, 4);
+			image(this.Image, 0, 1.5, 8, 4);
 		}
 		
 		popMatrix();
@@ -421,7 +366,7 @@ function PickDir(x,y,road){
 		posibilies = [(road+2)%4];
 	}
 
-	out = posibilies[round(random(-0.5,posibilies.length-0.50001))];
+	out = posibilies[round(random(0,posibilies.length-1))];
 	return out;
 }
 
@@ -475,13 +420,12 @@ Car.prototype.Drive = function(){
 	}
 
 	if(round(this.pos.x) === 0 && round(this.pos.y) === 0 && this.turned === false){
-		//println(this.road + ", " + this.newRoad);r
+		//println(this.road + ", " + this.newRoad);
 		this.turned = true;
 		this.road = this.newRoad;
 		this.rotation = 90*this.road;
 		this.pos.x = 0;
 		this.pos.y = 0;
-		this.stopTimer = 0;
 	}
 };
 
@@ -490,17 +434,7 @@ function FindCIF(that) { // CIF = Car in front
 	var nvalid = [];
 	
 	for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-<<<<<<< HEAD:City-Simulator.pde
-		var a = cars[valid[i]];
-		if(that.rotation === a.rotation && that.num !== cars[valid[i]].num){//(that.pos.x*cos(that.rotation) >= a.pos.x+abs(cos(a.rotation)+1)*4 && that.pos.x*cos(that.rotation) <= a.pos.x-abs(cos(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || (that.pos.y*sin(that.rotation) <= a.pos.y+abs(sin(a.rotation)+1)*4 && that.pos.y*sin(that.rotation) >= a.pos.y-abs(sin(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || 
-=======
-<<<<<<< HEAD:Processing/Test2.pde
-		var a = cars[valid[i]];
-		if(that.rotation === a.rotation && that.num !== cars[valid[i]].num){//(that.pos.x*cos(that.rotation) >= a.pos.x+abs(cos(a.rotation)+1)*4 && that.pos.x*cos(that.rotation) <= a.pos.x-abs(cos(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || (that.pos.y*sin(that.rotation) <= a.pos.y+abs(sin(a.rotation)+1)*4 && that.pos.y*sin(that.rotation) >= a.pos.y-abs(sin(a.rotation)+1)*4 && (that.rotation+180)%360 !== a.rotation) || 
-=======
-		if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
->>>>>>> 0cd440d25c556fa0e3c51e9b0aee15ae9222903d:Test2.pde
->>>>>>> 42106ad3502199ca593f9c00ac0aec8b4f8a23c8:Test2.pde
+		if(that.rotation === cars[valid[i]].rotation){
 			nvalid.push(valid[i]);
 		}
 	}
@@ -522,7 +456,7 @@ function FindCIF(that) { // CIF = Car in front
 			var valid = board[that.tile.x+temp][that.tile.y].cars;
 			var nvalid = [];
 			for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-				if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
+				if(that.rotation === cars[valid[i]].rotation){
 					nvalid.push(valid[i]);
 				}
 			}
@@ -552,7 +486,7 @@ function FindCIF(that) { // CIF = Car in front
 			var valid = board[that.tile.x][that.tile.y+temp].cars;
 			var nvalid = [];
 			for(var i = 0; i < valid.length; i++){ // find all cars in the same tile that have the same rotation
-				if(that.rotation === cars[valid[i]].rotation && that.num !== cars[valid[i]].num){
+				if(that.rotation === cars[valid[i]].rotation){
 					nvalid.push(valid[i]);
 				}
 			}
@@ -573,25 +507,11 @@ function FindCIF(that) { // CIF = Car in front
 }
 
 function FindInt(that) {
-	var output = [0,0,0]; //[dist, type(null if there are only 2 roads), dir of the light if there is a light]
-	output[0] = round(that.pos.x*-cos(that.rotation/90*HALF_PI) + that.pos.y*-sin(that.rotation/90*HALF_PI) - 14);
-	var tile = board[that.tile.x][that.tile.y];
-	if(tile.roadnum > 2){
-		output[1] = tile.intersection;
+	if(round(that.pos.x) === 0){
+		
 	}else{
-		output[1] = null;
-<<<<<<< HEAD:City-Simulator.pde
+		
 	}
-	if(tile.intersection === "LIGHT"){
-		output[2] = tile.Dir;
-	}
-=======
-	}
-	if(tile.intersection === "LIGHT"){
-		output[2] = tile.Dir;
-	}
->>>>>>> 42106ad3502199ca593f9c00ac0aec8b4f8a23c8:Test2.pde
-	return output;
 }
 
 Car.prototype.FindSpeed = function() {
@@ -599,7 +519,7 @@ Car.prototype.FindSpeed = function() {
 	
 	if(this.CIF[0] === -1){
 		this.speed = 10;
-	}else if(this.rotation === cars[this.CIF[0]].rotation){
+	}else{
 		this.CIFdist = this.CIF[1];
 		//println(this.CIFdist);
 		this.CIF = cars[this.CIF[0]];
@@ -607,35 +527,12 @@ Car.prototype.FindSpeed = function() {
 			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)-1,0,10);
 		}else if(this.CIFdist < 15){
 			this.speed = constrain(this.CIF.speed,0,this.CIF.maxSpeed);
-		}else if(this.CIFdist < 30){
-			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)+ceil(this.CIFdist/5*2)/2,0,10);
-		}else if(this.CIFdist < 50){
-			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)+ceil(this.CIFdist/5),0,10);
+		}else if(this.CIFdist < 20){
+			this.speed = constrain(constrain(this.CIF.speed,0,this.CIF.maxSpeed)+1,0,10);
 		}else{
-			this.speed = constrain(this.speed+0.5,0,10);
-		}
-	}else{
-		if(this.CIFdist < 5){
-			this.speed = 0;
+			this.speed = 10;
 		}
 	}
-	
-	this.Int = FindInt(this);
-
-	if(this.Int[1] !== null){
-		if(this.Int[1] === "LIGHT"){
-			if((this.Int[2] !== this.road%2 || this.road%2 !== (this.rotation/90)%2) && this.Int[0] >= 0 && this.Int[0] <= 2){
-				this.speed = 0;
-			}
-		}else{
-			if(this.Int[0] >= 0 && this.Int[0] <= 2 && this.stopTimer < this.stopTime*FR){
-				this.stopTimer++;
-				this.speed = 0;
-			}
-		}
-	}
-
-	averageSpeed += constrain(this.speed,0,this.maxSpeed);
 };
 
 var cars = [];
@@ -665,7 +562,7 @@ function CreateCar(){
 	//println(selection);
 }
 
-for(var i = 0; i < 1000; i++){
+for(var i = 0; i < 800; i++){
 	CreateCar();
 }
 
@@ -681,35 +578,18 @@ for(var x = 0; x < Size[0]; x++){
 	}
 }
 
-frameRate(FR);
-
 void draw(){
 	background(50,255,50);
 
-	if(dawn === true){
-		time+=0.01;
-		if(round(time%1*100)/100 === 0.6){
-			time = floor(time+1);
-		}
-	}else{
-		time-=0.01;
-		if(round(time%1*100) === 0){
-			time = floor(time-1)+0.6;
-		}
-	}
-	time = round(time*100)/100;
-
-	//println(floor(time) + ":" + round(time%1*100));
-
-	/*if(timer%5 === 0 && dawn === true){
+	if(timer%5 === 0 && dawn === true){
 		time = round((time+0.1)*10)/10;
 	}else if(timer%5 === 0 && dawn === false){
 		time = round((time-0.1)*10)/10;
-	}*/
+	}
 
-	if(time >= 13){
+	if(time === 12){
 		dawn = false;
-	}else if(time <= 1){
+	}else if(time === 0){
 		dawn = true;
 	}
 
@@ -720,17 +600,11 @@ void draw(){
 	//println(board_Scale);
 
 	//(x-(100/board_Scale))/board_Scale/10 = tx, (y-(100/board_Scale))/board_Scale/10 = ty
-	var mouseTile = board[constrain(round(((mouseX-offset[0])-(100/board_Scale))/board_Scale/10),0,Size[0])][constrain(round(((mouseY-offset[1])-(100/board_Scale))/board_Scale/10),0,Size[1])];
-
-	//println(round(mouseTile.intTime));
-
-	//println(board[mouseTile[0]][mouseTile[1]].timer + ", " + board[mouseTile[0]][mouseTile[1]].Dir);
-
+	var mouseTile = [constrain(round(((mouseX-offset[0])-(100/board_Scale))/board_Scale/10),0,Size[0]), constrain(round(((mouseY-offset[1])-(100/board_Scale))/board_Scale/10),0,Size[1])];
 	if(mousePressed){
 		//frameRate(5);
 		//println(mouseTile[0]+", "+mouseTile[1]);
 		//board[mouseTile[0]][mouseTile[1]].Connect();
-
 	}else{
 		//frameRate(60);
 	}
@@ -758,7 +632,7 @@ void draw(){
 	//}
 
 	if(timer%20 === 0 && round(random(0,1)) === 1 && cars.length < 300){
-		//CreateCar();
+		CreateCar();
 	}
 	
 	if(timer%1000 === 0){
@@ -775,17 +649,13 @@ void draw(){
 	for(var x = 0; x < board.length; x++){
 		for(var y = 0; y < board[x].length; y++){
 			board[x][y].Draw();
-			board[x][y].IntTick();
 		}
 	}
 
-	averageSpeed = 0;
 	for(var i = 0; i < cars.length; i++){
 		cars[i].FindSpeed();
 	}
-	//println(averageSpeed/cars.length);
 
-	noStroke();
 	for(var i = 0; i < cars.length; i++){
 		cars[i].Draw();
 		cars[i].Drive();
@@ -793,7 +663,7 @@ void draw(){
 
 	popMatrix();
 
-	fill(0, 0, 0, (time*13));
+	fill(0, 0, 0, (time*10));
 	rect(width/2,height/2,width,height);
 
 	timer++;
@@ -801,20 +671,6 @@ void draw(){
 	fill(255,0,0);
 	textSize(20);
 	text(frameRate, width-50, 20);
-	fill(255,255,255);
-	if(dawn === false){
-		if(round((12.6-time)%1*100) < 10){
-			text((floor(12.6-time) + ":0" + round((12.6-time)%1*100)), 0, 20);
-		}else{
-			text((floor(12.6-time) + ":" + round((12.6-time)%1*100)), 0, 20);
-		}
-	}else{
-		if(round((time)%1*100) < 10){
-			text((floor(time) + ":0" + round((time)%1*100)), 0, 20);
-		}else{
-			text((floor(time) + ":" + round((time)%1*100)), 0, 20);
-		}
-	}
 
 	//println(width);
 	//println();
